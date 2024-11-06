@@ -1,0 +1,82 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+struct Item {
+    int value;
+    int weight;
+};
+
+class Solution {
+public:
+    // Comparator function to sort items by value-to-weight ratio in descending order
+    static bool cmp(pair<double, Item> a, pair<double, Item> b) {
+        return a.first > b.first;
+    }
+
+    // Function to get the maximum total value in the knapsack.
+    double fractionalKnapsack(int W, Item arr[], int n) {
+        // Step 1: Calculate per unit value and store in vector
+        vector<pair<double, Item>> v;
+        for (int i = 0; i < n; i++) {
+            double perUnitValue = (1.0 * arr[i].value) / arr[i].weight;
+            v.push_back(make_pair(perUnitValue, arr[i]));
+        }
+        
+        // Step 2: Sort items by value-to-weight ratio in descending order
+        sort(v.begin(), v.end(), cmp);
+        
+        // Step 3: Add items to knapsack
+        double totalValue = 0;
+        for (int i = 0; i < n; i++) {
+            if (v[i].second.weight > W) {
+                // Take a fraction of the item
+                totalValue += W * v[i].first;
+                W = 0; // Knapsack is now full
+                break;
+            } else {
+                // Take the full item
+                totalValue += v[i].second.value;
+                W -= v[i].second.weight;
+            }
+        }
+        
+        return totalValue;
+    }
+};
+
+int main() {
+    int n, W;
+    cout << "Enter the number of items: ";
+    cin >> n;
+    cout << "Enter the maximum weight capacity of the knapsack: ";
+    cin >> W;
+
+    Item arr[n];
+    cout << "Enter the value and weight of each item:\n";
+    for (int i = 0; i < n; i++) {
+        cin >> arr[i].value >> arr[i].weight;
+    }
+
+    Solution sol;
+    double maxValue = sol.fractionalKnapsack(W, arr, n);
+    cout << "Maximum value in the knapsack = " << maxValue << endl;
+
+    return 0;
+}
+
+/*
+Enter the number of items: 3
+Enter the maximum weight capacity of the knapsack: 50
+Enter the value and weight of each item:
+60 10
+100 20
+120 30
+Maximum value in the knapsack = 240
+
+
+TC-O(nlogn)
+SC - O(n)
+*/
